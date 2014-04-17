@@ -25,5 +25,3 @@
     (*make-fun (car variables) body)
     (*make-fun (car variables)
                (make-fun (cdr variables) body))))
-
-

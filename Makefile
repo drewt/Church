@@ -6,8 +6,8 @@ LDFLAGS  =
 eggs = utf8 lalr
 
 target = lambda
-objects = lambda-ast.o lambda-interpreter.o lambda-parser.o lambda-target.o \
-	  target.o
+objects = lambda-ast.o lambda-interpreter.o lambda-operations.o lambda-parser.o\
+	  lambda-sugar.o lambda-target.o lambdaNB-parser.o target.o
 
 clean = $(objects) $(target)
 
@@ -22,7 +22,12 @@ lambda.yy.scm: lambda-grammar.scm
 	@echo "  GEN     $@"
 	@csi < $^ > /dev/null
 
+lambdaNB.yy.scm: lambdaNB-grammar.scm
+	@echo "  GEN     $@"
+	@csi < $^ > /dev/null
+
 lambda-parser.o: lambda-lexer.scm lambda.yy.scm
+lambdaNB-parser.o: lambda-lexer.scm lambdaNB.yy.scm
 
 eggs:
 	chicken-install $(eggs)

@@ -1,5 +1,6 @@
 (declare (uses target
-               lambda-parser
+               lambda-operations
+               lambdaNB-parser
                lambda-target))
 (use extras)
 
@@ -10,5 +11,7 @@
       (begin (display "quit") (newline))
       (let ((ast (parse expr)))
         (compile *lambda-target* ast)
+        (newline) (display "-> ")
+        (compile *lambda-target* (lambda-reduce ast))
         (newline)
         (loop)))))
