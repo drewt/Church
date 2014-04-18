@@ -83,6 +83,7 @@
                            (port-column (current-input-port)) -1 -1))
                (c (read-char)))
           (cond ((eof-object? c)      '*eoi*)
+                ((char=? c #\:)       (make-lexical-token 'COLON   location #f))
                 ((char=? c #\.)       (make-lexical-token 'DOT     location #f))
                 ((or (char=? c #\u03bb)
                      (char=? c #\\ )) (make-lexical-token 'LAMBDA  location #f))

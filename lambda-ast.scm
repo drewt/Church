@@ -4,9 +4,10 @@
 (declare (unit lambda-ast))
 
 (define-record-type variable
-  (make-var name)
+  (*make-var name type)
   variable?
-  (name variable-name))
+  (name variable-name)
+  (type variable-type))
 
 (define-record-type abstraction
   (*make-fun variable body)
@@ -19,6 +20,9 @@
   application?
   (function application-function)
   (argument application-argument))
+
+(define (make-var name)
+  (*make-var name #\-))
 
 (define (make-fun variables body)
   (if (null? (cdr variables))

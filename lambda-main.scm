@@ -3,6 +3,7 @@
                lambda-operations
                lambda-parser
                lambdaNB-parser
+               simply-typed-parser
                lambda-target
                scheme-target))
 (use extras)
@@ -39,6 +40,8 @@
       ((-p --parse)       (set! parse? #t))
       ((--sugarless)      (set! parse lambda-parse)
                           (set! parse-string lambda-parse-string))
+      ((--typed)          (set! parse st-parse)
+                          (set! parse-string st-parse-string))
       ((--scheme)         (set! target *scheme-target*))
       ((-e --expression)  (unless (null? (cdr args))
                             (set! expression (cadr args))

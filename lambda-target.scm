@@ -7,6 +7,13 @@
          (uses lambda-ast)
          (export *lambda-target*))
 
+(define (compile-variable var out)
+  (let ((name (variable-name var))
+        (type (variable-type var)))
+    (display name out)
+    (unless (char=? type #\-)
+      (display #\: out) (display type out))))
+
 (define (compile-abstraction fun out)
   (define (compile-subabstraction fun out)
     (lambda-compile (abstraction-variable fun) out)
@@ -34,7 +41,7 @@
 
 (define (lambda-compile ast out)
   (cond
-    ((variable? ast) (display (variable-name ast) out))
+    ((variable? ast)    (compile-variable ast out))
     ((abstraction? ast) (compile-abstraction ast out))
     ((application? ast) (compile-application ast out))
     (else (fprintf (current-error-port)
