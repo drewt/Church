@@ -7,7 +7,7 @@
       (let ((expr (read-line)))
         (if (eqv? expr #!eof)
           (begin (display "quit") (newline))
-          (let ((ast (parse-string expr)))
+          (let ((ast (parse expr)))
             (compile ast) (newline)
             (display #\u2192) (display " ")
             (compile (evaluate ast)) (newline)

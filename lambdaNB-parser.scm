@@ -8,11 +8,11 @@
 (include "lambdaNB.yy.scm")
 (include "lambda-lexer.scm")
 
-(define (parse-string str)
+(define (lambdaNB-parse-string str)
   (with-input-from-string str
     (lambda () (lambdaNB-parser (make-lexer errorp) errorp))))
 
-(define (parse)
+(define (lambdaNB-parse)
   (lambdaNB-parser (make-lexer errorp) errorp))
 
 (define (errorp msg . args)

@@ -7,13 +7,13 @@
 (include "lambda.yy.scm")
 (include "lambda-lexer.scm")
 
-(define (parse str)
+(define (lambda-parse-string str)
   (with-input-from-string
     str
     (lambda () (lambda-parser (make-lexer errorp) errorp))))
 
-;(define (parse)
-;  (lambda-parser (make-lexer errorp) errorp))
+(define (lambda-parse)
+  (lambda-parser (make-lexer errorp) errorp))
 
 (define (errorp msg . args)
   (display msg)

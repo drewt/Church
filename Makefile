@@ -8,7 +8,7 @@ eggs = utf8 lalr
 target = lambda
 objects = interpreter.o lambda-ast.o lambda-main.o lambda-operations.o \
 	  lambda-parser.o lambda-sugar.o lambda-target.o lambdaNB-parser.o \
-	  target.o
+	  scheme-target.o target.o
 
 clean = $(objects) $(target)
 
@@ -29,6 +29,10 @@ lambdaNB.yy.scm: lambdaNB-grammar.scm
 
 lambda-parser.o: lambda-lexer.scm lambda.yy.scm
 lambdaNB-parser.o: lambda-lexer.scm lambdaNB.yy.scm
+
+lambda-operations.o: ast-case.scm
+lambda-target.o: ast-case.scm
+scheme-target.o: ast-case.scm
 
 eggs:
 	chicken-install $(eggs)
