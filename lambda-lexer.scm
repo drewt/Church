@@ -68,7 +68,8 @@
              (read-name
                (lambda (l)
                  (let ((c (peek-char)))
-                   (if (char-alphabetic? c)
+                   (if (and (not (char-whitespace? c))
+                            (not (eof-object? c)))
                      (read-name (cons (read-char) l))
                      (apply string (reverse l)))))))
 

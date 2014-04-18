@@ -25,3 +25,8 @@
     (*make-fun (car variables) body)
     (*make-fun (car variables)
                (make-fun (cdr variables) body))))
+
+(define (ast? v)
+  (or (variable? v)
+      (abstraction? v)
+      (application? v)))

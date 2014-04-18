@@ -10,7 +10,8 @@
       (make-fun (list->ast-list (list vars ...))
                 (*make-app (list->ast-list (list fst snd rest ...)))))
     ((*fun (vars ...) body)
-      (make-fun (list vars ...) body))))
+      (make-fun (list->ast-list (list vars ...))
+                (->ast body)))))
 
 (define (*make-app lst)
   (let loop ((prev (make-app (car lst) (cadr lst))) (rest (cddr lst)))
@@ -23,15 +24,21 @@
     ((*app fst snd rest ...)
       (*make-app (list->ast-list (list fst snd rest ...))))))
 
+(define (->ast v)
+  (cond
+    ((char? v) (make-var v))
+    ((ast? v) v)))
+
 (define (list->ast-list lst)
-  (let loop ((lst lst))
-    (if (null? lst)
-      lst
-      (if (char? (car lst))
-        (cons (make-var (car lst))
-              (loop (cdr lst)))
-        (cons (car lst)
-              (loop (cdr lst)))))))
+  (let loop ((result '()) (rest lst))
+    (cond
+      ((null? rest) (reverse result))
+      ((char? (car rest))
+        (loop (cons (make-var (car rest)) result)
+              (cdr rest)))
+      (else
+        (loop (cons (car rest) result)
+              (cdr rest))))))
 
 (define (make-num n)
   (let loop ((prev (make-var #\x)) (n n))
@@ -91,7 +98,7 @@
 (define LAND   (*fun (#\p #\q) #\p #\q #\p))
 (define LOR    (*fun (#\p #\q) #\p #\p #\q))
 (define LNOT   (*fun (#\p #\a #\b) #\p #\b #\a))
-(define IFTHEN (*fun (#\x #\y #\x) #\x #\y #\z))
+(define IFTHEN (*fun (#\x #\y #\z) #\x #\y #\z))
 
 (define PAIR    (*fun (#\x #\y #\f) #\f #\x #\y))
 (define FST     (*fun (#\p) #\p TRUE))
@@ -102,10 +109,7 @@
 (define Y (*fun (#\g) (*fun (#\x) #\g (*app #\x #\x))
                       (*fun (#\x) #\g (*app #\x #\x))))
 
-(define SUCC (*fun (#\n #\f #\x)
-               #\f
-               (*app #\f
-                     (*app #\n #\f #\x))))
+(define SUCC (*fun (#\n #\f #\x) #\f (*app #\n #\f #\x)))
 
 (define PRED (*fun (#\n #\f #\x)
                #\n
@@ -117,7 +121,7 @@
               (*app #\m #\f)
               (*app #\n #\f #\x)))
 
-(define SUB (*fun (#\m #\n) #\m PRED #\n))
+(define SUB (*fun (#\m #\n) #\n PRED #\m))
 
 (define MUL (*fun (#\m #\n #\f) #\m (*app #\n #\f)))
 

@@ -36,7 +36,9 @@
   (cond
     ((variable? ast) (display (variable-name ast) out))
     ((abstraction? ast) (compile-abstraction ast out))
-    ((application? ast) (compile-application ast out))))
+    ((application? ast) (compile-application ast out))
+    (else (fprintf (current-error-port)
+                   "ERROR: unexpected value: ~a~n" ast))))
 
 (define *lambda-target*
   (make-compiler-target lambda-compile))
