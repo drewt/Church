@@ -21,14 +21,17 @@
   (function application-function)
   (argument application-argument))
 
-(define (make-var name)
-  (*make-var name #f))
+(define (make-var name #!optional (type #f))
+  (*make-var name type))
 
 (define (make-fun variables body)
-  (if (null? (cdr variables))
-    (*make-fun (car variables) body)
-    (*make-fun (car variables)
-               (make-fun (cdr variables) body))))
+  (cond
+    ((variable? variables) (*make-fun variables body))
+    ((null? (cdr variables))
+      (*make-fun (car variables) body))
+    (else
+      (*make-fun (car variables)
+                 (make-fun (cdr variables) body)))))
 
 (define (ast? v)
   (or (variable? v)
