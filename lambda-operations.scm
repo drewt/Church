@@ -6,6 +6,7 @@
                  lambda-reduce
                  lambda-substitute))
 
+(require-extension srfi-14)
 (include "ast-case.scm")
 
 (define (lambda-equal? a b)
@@ -34,10 +35,11 @@
                 (lambda-substitute arg v expr)))))
 
 (define (lambda-apply fun arg)
-  ; TODO: alpha-fixup
-  (lambda-substitute (abstraction-body fun)
-                     (abstraction-variable fun)
-                     arg))
+  (assert (abstraction? fun))
+  (let ((fixed-fun (alpha-fixup fun arg)))
+    (lambda-substitute (abstraction-body fixed-fun)
+                       (abstraction-variable fun)
+                       arg)))
 
 (define (lambda-reduce ast)
   (nor ast))
@@ -70,10 +72,52 @@
       ((var: name type)
         (if (member name bound)
           '()
-          (list name)))
+          (list ast)))
       ((fun: var body)
         (visit body (cons (variable-name var) bound)))
       ((app: fun arg)
         (append (visit fun bound)
                 (visit arg bound)))))
-  (visit ast '())) 
+  (visit ast '()))
+
+(define (lambda-vars ast)
+  (ast-case ast
+    ((var: name type) (list ast))
+    ((fun: var body) (cons var (lambda-vars body)))
+    ((app: fun arg) (append (lambda-vars fun)
+                            (lambda-vars arg)))))
+
+(define var-names
+  (string->char-set "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+
+(define (unused-var ast)
+  (let ((used (lambda-vars ast)))
+    (let loop ((cursor (char-set-cursor var-names)))
+        (cond
+          ((end-of-char-set? cursor) #f)
+          ((in-set? (make-var (char-set-ref var-names cursor)) used)
+            (loop (char-set-cursor-next var-names cursor)))
+          (else (make-var (char-set-ref var-names cursor)))))))
+
+(define (in-set? ast set)
+  (cond
+    ((null? set) #f)
+    ((lambda-equal? ast (car set)) #t)
+    (else (in-set? ast (cdr set)))))
+
+(define (alpha-fixup fun arg)
+  (let ((free (lambda-freevars arg)))
+    (define (fixup ast)
+      (ast-case ast
+        ((var: name type) ast)
+        ;; -- if fun-var free in arg, rename
+        ((fun: var body)
+          (if (in-set? var free)
+            (let* ((new-var (unused-var ast))
+                   (new-body (lambda-substitute body var new-var)))
+              (*make-fun new-var (fixup new-body)))
+            (*make-fun var (fixup body))))
+        ((app: fun arg)
+         (make-app (fixup fun) (fixup arg)))))
+    (*make-fun (abstraction-variable fun)
+               (fixup (abstraction-body fun)))))
