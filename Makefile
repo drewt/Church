@@ -39,5 +39,7 @@ lambda-operations.o: ast-case.scm
 lambda-target.o: ast-case.scm
 scheme-target.o: ast-case.scm
 
+interpreter.o: string-case.scm
+
 eggs:
 	chicken-install $(eggs)
