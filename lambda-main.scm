@@ -4,6 +4,7 @@
                lambda-parser
                lambdaNB-parser
                simply-typed-parser
+               ast-target
                lambda-target
                scheme-target))
 (use extras)
@@ -42,6 +43,7 @@
                           (set! parse-string lambda-parse-string))
       ((--typed)          (set! parse st-parse)
                           (set! parse-string st-parse-string))
+      ((--ast)            (set! target *ast-target*))
       ((--scheme)         (set! target *scheme-target*))
       ((-e --expression)  (unless (null? (cdr args))
                             (set! expression (cadr args))

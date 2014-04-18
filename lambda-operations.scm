@@ -10,28 +10,28 @@
 
 (define (lambda-equal? a b)
   (ast-case a
-    ((var: a-name)
-      (and (variable? b) (char=? a-name (variable-name b))))
-    ((fun: a-var a-body)
+    ((var: name type)
+      (and (variable? b) (char=? name (variable-name b))))
+    ((fun: var body)
       (and (abstraction? b)
-           (lambda-equal? a-var (abstraction-variable b))
-           (lambda-equal? a-body (abstraction-body b))))
-    ((app: a-fun a-arg)
+           (lambda-equal? var (abstraction-variable b))
+           (lambda-equal? body (abstraction-body b))))
+    ((app: fun arg)
       (and (application? b)
-           (lambda-equal? a-fun (application-function b))
-           (lambda-equal? a-arg (application-argument b))))))
+           (lambda-equal? fun (application-function b))
+           (lambda-equal? arg (application-argument b))))))
 
 (define (lambda-substitute ast v expr)
   (ast-case ast
-    ((var: var-name)
+    ((var: name type)
       (if (lambda-equal? ast v) expr ast))
-    ((fun: fun-var fun-body)
-      (if (lambda-equal? fun-var v)
+    ((fun: var body)
+      (if (lambda-equal? var v)
         ast
-        (*make-fun fun-var (lambda-substitute fun-body v expr))))
-    ((app: app-fun app-arg)
-      (make-app (lambda-substitute app-fun v expr)
-                (lambda-substitute app-arg v expr)))))
+        (*make-fun var (lambda-substitute body v expr))))
+    ((app: fun arg)
+      (make-app (lambda-substitute fun v expr)
+                (lambda-substitute arg v expr)))))
 
 (define (lambda-apply fun arg)
   ; TODO: alpha-fixup
@@ -45,7 +45,7 @@
 ;; "call by name" reduction strategy
 (define (cbn ast)
   (ast-case ast
-    ((var: n) ast)
+    ((var: n t) ast)
     ((fun: v b) ast)
     ((app: app-fun arg)
       (let ((fun (cbn app-fun)))
@@ -56,7 +56,7 @@
 ;; normal order reduction strategy
 (define (nor ast)
   (ast-case ast
-    ((var: name) ast)
+    ((var: name type) ast)
     ((fun: var body) (*make-fun var (nor body)))
     ((app: app-fun arg)
       (let ((fun (cbn app-fun)))
@@ -67,13 +67,13 @@
 (define (lambda-freevars ast)
   (define (visit ast bound)
     (ast-case ast
-      ((var: var-name)
-        (if (member var-name bound)
+      ((var: name type)
+        (if (member name bound)
           '()
-          (list var-name)))
-      ((fun: fun-var fun-body)
-        (visit fun-body (cons (variable-name fun-var) bound)))
-      ((app: app-fun app-arg)
-        (append (visit app-fun bound)
-                (visit app-arg bound)))))
+          (list name)))
+      ((fun: var body)
+        (visit body (cons (variable-name var) bound)))
+      ((app: fun arg)
+        (append (visit fun bound)
+                (visit arg bound)))))
   (visit ast '())) 

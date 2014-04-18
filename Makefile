@@ -6,9 +6,9 @@ LDFLAGS  =
 eggs = utf8 lalr
 
 target = lambda
-objects = interpreter.o lambda-ast.o lambda-main.o lambda-operations.o \
-	  lambda-parser.o lambda-sugar.o lambda-target.o lambdaNB-parser.o \
-	  scheme-target.o simply-typed-parser.o target.o
+objects = ast-target.o interpreter.o lambda-ast.o lambda-main.o \
+	  lambda-operations.o lambda-parser.o lambda-sugar.o lambda-target.o \
+	  lambdaNB-parser.o scheme-target.o simply-typed-parser.o target.o
 
 clean = $(objects) $(target)
 

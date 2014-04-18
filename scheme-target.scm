@@ -10,7 +10,7 @@
 (define (scheme-compile ast out)
   (define (*scheme-compile ast)
     (ast-case ast
-      ((var: name) (string->symbol (string name)))
+      ((var: name type) (string->symbol (string name)))
       ((fun: var body)
         (list 'lambda (list (*scheme-compile var))
                 (*scheme-compile body)))
