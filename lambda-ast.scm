@@ -22,7 +22,7 @@
   (argument application-argument))
 
 (define (make-var name)
-  (*make-var name #\-))
+  (*make-var name #f))
 
 (define (make-fun variables body)
   (if (null? (cdr variables))

@@ -11,7 +11,7 @@
   (let ((name (variable-name var))
         (type (variable-type var)))
     (display name out)
-    (unless (char=? type #\-)
+    (when type
       (display #\: out) (display type out))))
 
 (define (compile-abstraction fun out)
