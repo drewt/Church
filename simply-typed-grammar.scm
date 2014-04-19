@@ -14,7 +14,7 @@
    (expect:    5)
 
    ;; --- token definitions
-   (ID LAMBDA BOOL NUM BUILTIN LPAREN RPAREN DOT COLON)
+   (ID ARROW LAMBDA BOOL NUM BUILTIN LPAREN RPAREN DOT COMMA COLON)
 
    ;; --- rules
    ;; whichever file includes this parser is responsible for providing
@@ -24,13 +24,19 @@
           (LPAREN expr RPAREN)    : $2
           (expr tail)             : (make-app $1 $2))
    (var   (ID)                    : (make-var $1))
-   (type  (ID COLON ID)           : (*make-var $1 $3))
-   (types (type)                  : (cons $1 '())
-          (type types)            : (cons $1 $2))
+   (*str  (ID)                    : (cons $1 '())
+          (ID *str)               : (cons $1 $2))
+   (str   (*str)                  : (list->string $1))
+   (type  (str)                   : (make-type $1 #f)
+          (LPAREN type RPAREN)    : $2
+          (type ARROW type)       : (make-type $1 $3))
+   (farg  (ID COLON type)         : (make-var $1 $3))
+   (fargs (farg)                  : (cons $1 '())
+          (farg COMMA fargs)      : (cons $1 $3))
    (const (var)                   : $1
           (NUM)                   : (make-num $1)
           (BOOL)                  : (make-bool $1)
           (BUILTIN)               : (make-builtin $1))
-   (fun   (LAMBDA types DOT expr) : (make-fun $2 $4))
+   (fun   (LAMBDA fargs DOT expr) : (make-fun $2 $4))
    (tail  (const)                 : $1
           (LPAREN expr RPAREN)    : $2)))
